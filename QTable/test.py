@@ -19,7 +19,7 @@ if mode == range:
     obs_buckets = 1
 
 # Carica la Q-table addestrata
-filename = f'qtable_{mode}.dill'  
+filename = f'qtable_{mode}.dill'
 qtable = load_qtable(filename)
 # Crea l'ambiente
 env = gym.make("BipedalWalker-v3", render_mode = 'human')
@@ -109,14 +109,6 @@ def undiscretizeAction(action):
     action = (np.array(action) / (act_buckets - 1)) * (env.action_space.high - env.action_space.low) + env.action_space.low
     return tuple(action)
 
-window_size = 100
-def moving_average(data, window_size=window_size):
-    moving_averages = []
-    for i in range(len(data) - window_size + 1):
-        window = data[i:i + window_size]
-        window_average = np.mean(window)
-        moving_averages.append(window_average)
-    return moving_averages
 
 # Testa la Q-table caricata
 test_rewards = test_qtable(env, qtable, episodes=100, render=False)
@@ -124,10 +116,8 @@ test_rewards = test_qtable(env, qtable, episodes=100, render=False)
 # Plot dei premi per gli episodi di test
 plt.figure(figsize=(12, 6))
 plt.plot(test_rewards, label='Total Reward')
-if len(test_rewards) >= window_size:
-    plt.plot(range(window_size, len(test_rewards) + 1), moving_average(test_rewards), label='Moving Average (100 episodes)')
 plt.xlabel('Episode')
 plt.ylabel('Total Reward')
-plt.title('Reward Evolution (Testing with Loaded Q-table)')
+plt.title('Rewards (Testing with Loaded Q-table)')
 plt.legend()
 plt.savefig(f'Rewards {mode}.png')
