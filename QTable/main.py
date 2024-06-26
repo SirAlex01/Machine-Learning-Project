@@ -38,11 +38,11 @@ if mode == 'uniform' or mode == 'range':
 
     qtable, rewards, elapsed_times = q_learning.learn()
 
-    # Save the Q-table for uniform discretization
+    # Save the Q-table 
     with open(f'qtable_{mode}.dill', 'wb') as f:
         dill.dump(qtable, f)
 
-    # Plot rewards for uniform discretization
+    # Plot rewards 
     plt.figure(figsize=(12, 6))
     plt.plot(rewards, label='Total Reward')
     if len(rewards) >= window_size:
@@ -53,7 +53,7 @@ if mode == 'uniform' or mode == 'range':
     plt.legend()
     plt.savefig(f'Rewards Evolutions {mode}.png')
 
-    # Plot elapsed times for uniform discretization
+    # Plot elapsed times
     plt.figure(figsize=(12, 6))
     plt.plot(elapsed_times, label=f'Elapsed Time ({mode})')
     plt.xlabel('Episode')

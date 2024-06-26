@@ -4,7 +4,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-# Funzione per caricare la Q-table da un file
 def load_qtable(filename):
     with open(filename, 'rb') as f:
         qtable = dill.load(f)
@@ -18,17 +17,13 @@ obs_buckets = 11
 if mode == range:
     obs_buckets = 1
 
-# Carica la Q-table addestrata
 filename = f'qtable_{mode}.dill'
 qtable = load_qtable(filename)
-# Crea l'ambiente
 env = gym.make("BipedalWalker-v3", render_mode = 'human')
 
 
-# Funzione per testare la Q-table caricata
 def test_qtable(env, qtable, episodes=100, render=True):
-    rewards = []  # Lista per memorizzare i premi totali di ogni episodio
-
+    rewards = []  
     for episode in range(1, episodes + 1):
         total_reward = 0
         state = env.reset()[0]
@@ -110,10 +105,8 @@ def undiscretizeAction(action):
     return tuple(action)
 
 
-# Testa la Q-table caricata
 test_rewards = test_qtable(env, qtable, episodes=100, render=False)
 
-# Plot dei premi per gli episodi di test
 plt.figure(figsize=(12, 6))
 plt.plot(test_rewards, label='Total Reward')
 plt.xlabel('Episode')
