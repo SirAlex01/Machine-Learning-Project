@@ -10,7 +10,7 @@ def load_qtable(filename):
     return qtable
 
 
-mode = 'uniform'
+mode = 'range'
 act_buckets = 11
 obs_buckets = 11
 
@@ -111,6 +111,6 @@ plt.figure(figsize=(12, 6))
 plt.plot(test_rewards, label='Total Reward')
 plt.xlabel('Episode')
 plt.ylabel('Total Reward')
-plt.title('Rewards (Testing with Loaded Q-table)')
+plt.title(f'Rewards of {mode} mode (Testing with Loaded Q-table)')
 plt.legend()
 plt.savefig(f'Rewards {mode}.png')
