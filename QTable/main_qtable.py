@@ -1,11 +1,8 @@
 import gymnasium as gym
 import numpy as np
-import random
-from collections import defaultdict
 import matplotlib.pyplot as plt
-import time
 import dill
-from qtable import QTableLearning
+from QTable import QTableLearning
 
 # Initialize the Bipedal Walker environment
 env = gym.make('BipedalWalker-v3')#, render_mode="human")
@@ -16,6 +13,7 @@ act = env.action_space
 
 print(f"Observation Space: {obs}")
 print(f"Action Space: {act}")
+
 window_size = 100
 
 # Function to calculate the moving average using np.mean
@@ -38,11 +36,11 @@ if mode == 'uniform' or mode == 'range':
 
     qtable, rewards, elapsed_times = q_learning.learn()
 
-    # Save the Q-table 
+    # Save the Q-table
     with open(f'qtable_{mode}.dill', 'wb') as f:
         dill.dump(qtable, f)
 
-    # Plot rewards 
+    # Plot rewards
     plt.figure(figsize=(12, 6))
     plt.plot(rewards, label='Total Reward')
     if len(rewards) >= window_size:

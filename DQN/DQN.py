@@ -12,24 +12,23 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # Hyperparameters
 #agent
 ACT_BUCKETS = 11
-EPISODES = 1000
+EPISODES = 2
 REWARD_THRESHOLD = -200
-GAMMA = 0.99
-ALPHA = 0.01
+GAMMA = 0.9
+ALPHA = 0.001
 EPSILON_INIT = 1.0
-EPSILON_DECAY = 0.997
+EPSILON_DECAY = 0.9999
 EPSILON_MIN = 0.05
 NORMALIZE = True
 
 #experience replay
-BATCH_SIZE = 16
+BATCH_SIZE = 64
 MEM_SIZE = 1000000
 
 #neural network
 HIDDEN_SIZE = 512
 LR = 1e-3
 L2_LAMBDA = 0.001
-
 
 # Experience Replay
 class ExperienceReplay:

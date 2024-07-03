@@ -4,8 +4,6 @@ import gymnasium as gym
 import matplotlib.pyplot as plt
 from DQN import Agent
 
-
-# Definizione dell'ambiente
 ENV = "BipedalWalker-v3"
 
 env = gym.make(ENV)

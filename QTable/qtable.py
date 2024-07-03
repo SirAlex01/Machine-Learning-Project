@@ -1,4 +1,3 @@
-import gymnasium as gym
 import numpy as np
 import random
 from collections import defaultdict
@@ -12,8 +11,8 @@ REWARD_THRESHOLD = -200
 GAMMA = 0.99
 ALPHA = 0.01
 EPSILON_INIT = 1.0
-EPSILON_DECAY = 0.9997
-EPSILON_MIN = 0.05
+EPSILON_DECAY = 0.9999
+EPSILON_MIN = 0.01
 
 class QTableLearning:
     def __init__(self, env, episodes=EPISODES, gamma=GAMMA, alpha=ALPHA, epsilon_init=EPSILON_INIT, epsilon_decay=EPSILON_DECAY, epsilon_min=EPSILON_MIN,
@@ -166,7 +165,6 @@ class QTableLearning:
             while total_reward > self.reward_threshold:
                 action = self.epsilonGreedyStrategy(state)
                 continuous_action = self.undiscretizeAction(action)
-
                 next_state, reward, done, _, _ = self.env.step(continuous_action)
 
                 if self.render and steps_taken % self.render_interval == 0:
