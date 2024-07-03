@@ -12,12 +12,12 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # Hyperparameters
 #agent
 ACT_BUCKETS = 11
-EPISODES = 2
+EPISODES = 1000
 REWARD_THRESHOLD = -200
 GAMMA = 0.9
 ALPHA = 0.001
 EPSILON_INIT = 1.0
-EPSILON_DECAY = 0.9999
+EPSILON_DECAY = 0.999
 EPSILON_MIN = 0.05
 NORMALIZE = True
 

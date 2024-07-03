@@ -53,6 +53,7 @@ def eval_policy(policy, env, episodes, device, render=False):
 	for ep_num in range(1, episodes + 1):
 		obs = env.reset()[0]
 		done = False
+		render_freq = 10
 
 		# number of timesteps so far
 		t = 0
@@ -65,7 +66,7 @@ def eval_policy(policy, env, episodes, device, render=False):
 			t += 1
 
 			# Render environment if specified, off by default
-			if render:
+			if render and t % render_freq == 0:
 				env.render()
 
 			# Query deterministic action from policy and run it
@@ -85,7 +86,7 @@ def eval_policy(policy, env, episodes, device, render=False):
 
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-env = gym.make("BipedalWalker-v3")#, render_mode = 'human')
+env = gym.make("BipedalWalker-v3", render_mode = 'human')
 obs_dim = env.observation_space.shape[0]
 act_dim = env.action_space.shape[0]
 actor_model = torch.load("ppo_actor.pth", map_location=device)

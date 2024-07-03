@@ -8,7 +8,7 @@ from DQN import QNetwork
 ENV = "BipedalWalker-v3"
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 EPISODES = 100
-NORMALIZE = True
+NORMALIZE = False
 
 
 class Normalizer:
@@ -41,7 +41,7 @@ action_buckets = 11
 model_params = torch.load('dqn_model.pth', map_location=DEVICE)
 
 # Crea l'ambiente
-env = gym.make(ENV)
+env = gym.make(ENV, render_mode = 'human')
 state_dim = env.observation_space.shape[0]
 action_dim = env.action_space.shape[0]
 
@@ -50,8 +50,9 @@ model = QNetwork(state_dim, action_buckets ** action_dim).to(DEVICE)
 model.load_state_dict(model_params)
 model.eval()  # Imposta il modello in modalità valutazione
 
-def test_DQN(dqn, env, episodes, normalize):
+def test_DQN(dqn, env, episodes = EPISODES, normalize = NORMALIZE):
     rewards = []
+    render_freq = 10
     if normalize:
         normalizer = Normalizer(env.observation_space.shape[0])
     for i in range(episodes):
@@ -60,6 +61,7 @@ def test_DQN(dqn, env, episodes, normalize):
             normalizer.update(observation)
         total_reward = 0
         done = False
+        steps = 0
 
         while not done:
             with torch.no_grad():  # Disabilita il calcolo dei gradienti durante l'inferenza
@@ -73,7 +75,8 @@ def test_DQN(dqn, env, episodes, normalize):
                 flat_discrete_action = q_values.argmax().item()
                 discrete_action = np.array(np.unravel_index(flat_discrete_action, [action_buckets] * env.action_space.shape[0]))
                 action = (discrete_action / (action_buckets - 1)) * (env.action_space.high - env.action_space.low) + env.action_space.low
-
+                print(flat_discrete_action, discrete_action, action)
+                #print(state)
             # Esegui l'azione nell'ambiente
             next_observation, reward, done, _, _ = env.step(action)
             if normalize:
@@ -82,7 +85,9 @@ def test_DQN(dqn, env, episodes, normalize):
             observation = next_observation
 
             # Visualizza l'ambiente (commenta questa linea se non vuoi visualizzare l'ambiente)
-            env.render()
+            if steps % render_freq == 0:
+                env.render()
+            steps += 1
         rewards.append(total_reward)
 
         print(f"Episode {i + 1}, Total Reward: {total_reward}")
@@ -92,7 +97,7 @@ def test_DQN(dqn, env, episodes, normalize):
     return rewards
 
 # Esegui il test
-rewards = test_DQN(model, env, EPISODES, NORMALIZE)
+rewards = test_DQN(model, env)
 
 
 plt.figure(figsize=(12, 6))
