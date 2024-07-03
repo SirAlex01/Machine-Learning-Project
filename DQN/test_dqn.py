@@ -8,7 +8,7 @@ from DQN import QNetwork
 ENV = "BipedalWalker-v3"
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 EPISODES = 100
-NORMALIZE = False
+NORMALIZE = True
 
 
 class Normalizer:
