@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from PPO import FeedForwardNN, PPO
 
 env = gym.make("BipedalWalker-v3")
+
 hyperparameters = {
     'lr': 1e-3,
     'gamma': 0.99,
@@ -13,7 +14,7 @@ hyperparameters = {
 }
 
 model = PPO(policy_class=FeedForwardNN, env=env, **hyperparameters)
-rewards, elapsed_times = model.learn(total_timesteps=1e7)
+rewards, actor_losses, critic_losses, elapsed_times = model.learn(total_timesteps=1e7)
 
 #plotta i rewards e gli elapsed times delle iterazioni (ora no sbatti copia da altro codice)
 
@@ -36,10 +37,29 @@ plt.ylabel('Total Reward')
 plt.title(f'Reward Evolution (PPO)')
 plt.legend()
 plt.savefig(f'Rewards Evolutions PPO.png')
+
+# Plot actor losses
+plt.figure(figsize=(12, 6))
+plt.plot(actor_losses, label=f'Actor Losses (PPO)')
+plt.xlabel('Iteration')
+plt.ylabel('Actor Loss')
+plt.title(f'Loss Value of the Actor per Iteration')
+plt.legend()
+plt.savefig(f'Actor Losses PPO.png')
+
+# Plot critic losses
+plt.figure(figsize=(12, 6))
+plt.plot(critic_losses, label=f'Critic Losses (PPO)')
+plt.xlabel('Iteration')
+plt.ylabel('Critic Loss')
+plt.title(f'Loss Value of the Critic per Iteration')
+plt.legend()
+plt.savefig(f'Critic Losses PPO.png')
+
 # Plot elapsed times
 plt.figure(figsize=(12, 6))
 plt.plot(elapsed_times, label=f'Elapsed Time (PPO)')
-plt.xlabel('Episode')
+plt.xlabel('Iteration')
 plt.ylabel('Elapsed Time (s)')
 plt.title(f'Elapsed Time per Iteration')
 plt.legend()

@@ -8,7 +8,7 @@ ENV = "BipedalWalker-v3"
 
 env = gym.make(ENV)
 agent = Agent(env)
-model_params, rewards, elapsed_times = agent.learn()
+model_params, rewards, losses, elapsed_times = agent.learn()
 
 # Save the trained model parameters
 torch.save(model_params, 'dqn_model.pth')
@@ -32,6 +32,16 @@ plt.ylabel('Total Reward')
 plt.title(f'Reward Evolution (DQN)')
 plt.legend()
 plt.savefig(f'Rewards Evolutions DQN.png')
+
+# Plot losses
+plt.figure(figsize=(12, 6))
+plt.plot(losses, label=f'Losses (DQN)')
+plt.xlabel('Episode')
+plt.ylabel('Loss (MSE)')
+plt.title(f'Loss Value per Episode')
+plt.legend()
+plt.savefig(f'Losses DQN.png')
+
 # Plot elapsed times
 plt.figure(figsize=(12, 6))
 plt.plot(elapsed_times, label=f'Elapsed Time (DQN)')

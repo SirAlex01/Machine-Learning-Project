@@ -14,8 +14,8 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 ACT_BUCKETS = 11
 EPISODES = 1000
 REWARD_THRESHOLD = -200
-GAMMA = 0.9
-ALPHA = 0.001
+GAMMA = 0.99
+ALPHA = 0.01
 EPSILON_INIT = 1.0
 EPSILON_DECAY = 0.999
 EPSILON_MIN = 0.05
@@ -28,7 +28,6 @@ MEM_SIZE = 1000000
 #neural network
 HIDDEN_SIZE = 512
 LR = 1e-3
-L2_LAMBDA = 0.001
 
 # Experience Replay
 class ExperienceReplay:
@@ -98,8 +97,7 @@ class Normalizer:
 # Agent
 class Agent:
     def __init__(self, env, episodes=EPISODES, gamma=GAMMA, alpha=ALPHA, epsilon_init=EPSILON_INIT, epsilon_decay=EPSILON_DECAY, epsilon_min=EPSILON_MIN,
-                 experience_replay_size=MEM_SIZE, act_buckets=ACT_BUCKETS, reward_threshold=REWARD_THRESHOLD, normalize=NORMALIZE, lr=LR, l2_lambda=L2_LAMBDA,
-                 render=False):
+                 experience_replay_size=MEM_SIZE, act_buckets=ACT_BUCKETS, reward_threshold=REWARD_THRESHOLD, normalize=NORMALIZE, lr=LR, render=False):
         self.env = env
         self.episodes = episodes
         self.gamma = gamma
@@ -117,7 +115,7 @@ class Agent:
         # train the NN every "learning_frequency" steps
         self.learning_frequency = 1
         # weight_decay is the L2 regularization parameter in Adam
-        self.optimizer = optim.Adam(self.model.parameters(), lr=lr, weight_decay=l2_lambda)
+        self.optimizer = optim.Adam(self.model.parameters(), lr=lr)
 
         self.normalize = normalize
         # dynamic normalization computing mean and variance based on observations
@@ -155,6 +153,7 @@ class Agent:
         self.optimizer.zero_grad()
         loss.backward()
         self.optimizer.step()
+        return loss.item()
 
     def choose_action(self, state):
         if random.random() < self.epsilon:
@@ -167,15 +166,19 @@ class Agent:
                     state = self.normalizer.normalize(state)
                 q_values = self.model(state)
                 discrete_action = q_values.argmax().item()
+
                 return discrete_action
 
     def learn(self):
         rewards = []
         elapsed_times = []
+        losses = []
+
         for episode in range(1, self.episodes + 1):
             total_reward = 0
             steps_taken = 0
             start_time = time.time()
+            episode_losses = []
 
             observation = self.env.reset()[0]
             if self.normalize:
@@ -198,7 +201,8 @@ class Agent:
                                              reward, torch.tensor(next_observation).float().to(DEVICE), done)
 
                 if steps_taken % self.learning_frequency == 0 and len(self.memory) > self.memory.batch_size:
-                    self.updateDQN()
+                    current_loss = self.updateDQN()
+                    episode_losses.append(current_loss)
 
                 if self.render and steps_taken % self.render_interval == 0:
                     self.env.render()
@@ -213,10 +217,11 @@ class Agent:
             end_time = time.time()
             elapsed_time = end_time - start_time
             elapsed_times.append(elapsed_time)
+            losses.append(np.mean(episode_losses))
             rewards.append(total_reward)  # Store total reward for this episode
             print(f"Episode {episode}/{self.episodes}, Total Reward: {total_reward}, Elapsed Time: {elapsed_time}")
 
         self.env.close()
         max_reward = max(rewards)  # Calculate the maximum reward
         print(f"Maximum Reward: {max_reward}")
-        return self.model.state_dict(), rewards, elapsed_times
+        return self.model.state_dict(), rewards, losses, elapsed_times

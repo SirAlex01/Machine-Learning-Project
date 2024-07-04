@@ -55,7 +55,6 @@ class FeedForwardNN(nn.Module):
 
 		return output
 	
-
 class PPO:
 	"""
 		This is the PPO class we will use as our model in main.py
@@ -122,6 +121,9 @@ class PPO:
 
 		rewards = []
 		elapsed_times = []
+		actor_losses = []
+		critic_losses = []
+
 		while t_so_far < total_timesteps:                                                                       # ALG STEP 2
 			# Autobots, roll out (just kidding, we're collecting our batch simulations here)
 			batch_obs, batch_acts, batch_log_probs, batch_rtgs, batch_lens, batch_rews = self.rollout()                     # ALG STEP 3
@@ -150,6 +152,8 @@ class PPO:
 			# solving some environments was too unstable without it.
 			A_k = (A_k - A_k.mean()) / (A_k.std() + 1e-10)
 
+			actor_losses_it = []
+			critic_losses_it = []
 			# This is the loop where we update our network for some n epochs
 			for _ in range(self.n_updates_per_iteration):                                                       # ALG STEP 6 & 7
 				# Calculate V_phi and pi_theta(a_t | s_t)
@@ -174,6 +178,8 @@ class PPO:
 				# performance function maximizes it.
 				actor_loss = (-torch.min(surr1, surr2)).mean()
 				critic_loss = nn.MSELoss()(V, batch_rtgs)
+				actor_losses_it.append(actor_loss.item())
+				critic_losses_it.append(critic_loss.item())
 
 				# Calculate gradients and perform backward propagation for actor network
 				self.actor_optim.zero_grad()
@@ -192,11 +198,13 @@ class PPO:
 			delta_t = self._log_summary()
 	 		# Collect elapsed times
 			elapsed_times.append(delta_t)
+			actor_losses.append(np.mean(actor_losses_it))
+			critic_losses.append(np.mean(critic_losses_it))
 
 	 	# At the end of training, save network parameters
 		torch.save(self.actor.state_dict(), './ppo_actor.pth')
 		torch.save(self.critic.state_dict(), './ppo_critic.pth')
-		return rewards, elapsed_times
+		return rewards, actor_losses, critic_losses, elapsed_times
 
 	def rollout(self):
 		"""
