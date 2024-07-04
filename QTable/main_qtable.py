@@ -25,7 +25,7 @@ def moving_average(data, window_size=window_size):
         moving_averages.append(window_average)
     return moving_averages
 
-mode = 'range'
+mode = 'uniform'
 
 if mode == 'uniform':
     q_learning = QTableLearning(env, mode=mode)  # Initialize Q-learning with uniform discretization
