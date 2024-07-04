@@ -9,7 +9,8 @@ ENV = "BipedalWalker-v3"
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 EPISODES = 100
 NORMALIZE = True
-
+REWARD_THRESHOLD = -1000
+STEPS_THRESHOLD = 10000
 
 class Normalizer:
     def __init__(self, num_inputs):
@@ -50,7 +51,7 @@ model = QNetwork(state_dim, action_buckets ** action_dim).to(DEVICE)
 model.load_state_dict(model_params)
 model.eval()  # Imposta il modello in modalità valutazione
 
-def test_DQN(dqn, env, episodes = EPISODES, normalize = NORMALIZE):
+def test_DQN(dqn, env, episodes = EPISODES, normalize = NORMALIZE, reward_threshold = REWARD_THRESHOLD, steps_threshold = STEPS_THRESHOLD):
     rewards = []
     render_freq = 10
     if normalize:
@@ -63,7 +64,7 @@ def test_DQN(dqn, env, episodes = EPISODES, normalize = NORMALIZE):
         done = False
         steps = 0
 
-        while not done:
+        while not done and total_reward > reward_threshold and steps < steps_threshold:
             with torch.no_grad():  # Disabilita il calcolo dei gradienti durante l'inferenza
                 # Preprocessa l'osservazione se necessario
                 state = torch.tensor(observation).float().to(DEVICE)
@@ -75,8 +76,7 @@ def test_DQN(dqn, env, episodes = EPISODES, normalize = NORMALIZE):
                 flat_discrete_action = q_values.argmax().item()
                 discrete_action = np.array(np.unravel_index(flat_discrete_action, [action_buckets] * env.action_space.shape[0]))
                 action = (discrete_action / (action_buckets - 1)) * (env.action_space.high - env.action_space.low) + env.action_space.low
-                print(flat_discrete_action, discrete_action, action)
-                #print(state)
+
             # Esegui l'azione nell'ambiente
             next_observation, reward, done, _, _ = env.step(action)
             if normalize:

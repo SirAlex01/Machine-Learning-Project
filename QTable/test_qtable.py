@@ -10,7 +10,7 @@ def load_qtable(filename):
     return qtable
 
 
-mode = 'range'
+mode = 'uniform'
 act_buckets = 9
 obs_buckets = 9
 
@@ -22,10 +22,10 @@ qtable = load_qtable(filename)
 env = gym.make("BipedalWalker-v3", render_mode = 'human')
 
 
-def test_qtable(qtable, env, episodes=100, render=True):
+def test_qtable(qtable, env, episodes=100, reward_threshold = -1000, steps_threshold = 10000, render=True):
     rewards = []
     render_freq = 10
-    
+
     for episode in range(1, episodes + 1):
         total_reward = 0
         state = env.reset()[0]
@@ -33,7 +33,7 @@ def test_qtable(qtable, env, episodes=100, render=True):
         steps = 0
         done = False
 
-        while not done:
+        while not done and total_reward > reward_threshold and steps < steps_threshold:
             flat_best_action_index = np.argmax(qtable[state])
             action = np.array(np.unravel_index(flat_best_action_index, qtable[state].shape))
             continuous_action = undiscretizeAction(action)
@@ -46,7 +46,7 @@ def test_qtable(qtable, env, episodes=100, render=True):
             total_reward += reward
             state = next_state
             steps += 1
-          
+
 
         rewards.append(total_reward)
         print(f"Test Episode {episode}/{episodes}, Total Reward: {total_reward}")
