@@ -10,9 +10,9 @@ def load_qtable(filename):
     return qtable
 
 
-mode = 'uniform'
-act_buckets = 11
-obs_buckets = 11
+mode = 'range'
+act_buckets = 9
+obs_buckets = 9
 
 if mode == 'range':
     obs_buckets = 1

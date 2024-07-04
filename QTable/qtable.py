@@ -4,8 +4,8 @@ from collections import defaultdict
 import time
 
 #hyperparameters
-OBS_BUCKETS = 11
-ACT_BUCKETS = 11
+OBS_BUCKETS = 9
+ACT_BUCKETS = 9
 EPISODES = 10000
 REWARD_THRESHOLD = -200
 GAMMA = 0.99
