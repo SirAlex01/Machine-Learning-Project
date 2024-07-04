@@ -2,7 +2,7 @@ import gymnasium as gym
 import numpy as np
 import matplotlib.pyplot as plt
 import dill
-from QTable import QTableLearning
+from qtable import QTableLearning
 
 # Initialize the Bipedal Walker environment
 env = gym.make('BipedalWalker-v3')#, render_mode="human")
