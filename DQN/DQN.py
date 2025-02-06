@@ -114,7 +114,7 @@ class Agent:
         self.model = QNetwork(env.observation_space.shape[0], self.action_buckets**env.action_space.shape[0]).to(DEVICE)
         # train the NN every "learning_frequency" steps
         self.learning_frequency = 1
-        # weight_decay is the L2 regularization parameter in Adam
+        
         self.optimizer = optim.Adam(self.model.parameters(), lr=lr)
 
         self.normalize = normalize
