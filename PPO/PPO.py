@@ -394,7 +394,7 @@ class PPO:
 		self.clip = 0.2                                 # Recommended 0.2, helps define the threshold to clip the ratio during SGA
 
 		# Miscellaneous parameters
-		self.render = False                              # If we should render during rollout
+		self.render = False                             # If we should render during rollout
 		self.render_every_i = 10                        # Only render every n iterations
 		self.seed = None                                # Sets the seed of our program, used for reproducibility of results
 

@@ -130,11 +130,6 @@ class Agent:
         action = (discrete_action / (self.action_buckets - 1)) * (self.env.action_space.high - self.env.action_space.low) + self.env.action_space.low
         return tuple(action)
 
-    def store(self, state, action, reward, new_state, done):
-        self.memory.store_transition(state, action, reward, new_state, done)
-        if len(self.memory) > BATCH_SIZE:
-            self.learn()
-
     def updateDQN(self):
         states, actions, rewards, next_states, dones = self.memory.sample()
         if self.normalize:
@@ -199,7 +194,7 @@ class Agent:
 
                 self.memory.store_transition(torch.tensor(observation).float().to(DEVICE), torch.tensor(action).long().to(DEVICE),
                                              reward, torch.tensor(next_observation).float().to(DEVICE), done)
-
+                # (stato, reward, azione, stato_successivo, fatto) 
                 if steps_taken % self.learning_frequency == 0 and len(self.memory) > self.memory.batch_size:
                     current_loss = self.updateDQN()
                     episode_losses.append(current_loss)
